@@ -36,11 +36,14 @@
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
     <script type="text/javascript" src="../osql.js"></script>
     <script type="text/javascript">
+      var now = new Date();
+      var yesterday = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate() - 1} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+
       async function buttonPressed() {
         var student_id = document.getElementById('student_id').value;
         var subject = document.getElementById('subject').value;
         
-
+        
 
         if (student_id.length === 4)  {
 
@@ -66,10 +69,7 @@
           }
           document.getElementById('your_name').innerHTML = str;
 
-          // 24時間以内に作ったもの
-          var now = new Date();
-          var yesterday = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate() - 1} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-
+         
           // 昨日の時間よりもtimeが早ければ表示する
           var sql = 'select Question.question from Question where Question.student_id ="'+ student_id + '" and Question.subject = "'+ subject +'" and time >= "'+ yesterday +'"';
 
@@ -120,7 +120,7 @@
 
         var student_id = document.getElementById('student_id').value;
         var subject = document.getElementById('subject').value;
-        var sql = 'select Question.answer from Question where Question.student_id ="' + student_id + '" and Question.subject = "'+ subject + '"';
+        var sql = 'select Question.answer from Question where Question.student_id ="' + student_id + '" and Question.subject = "'+ subject + '" and time >= "'+ yesterday +'"';
         var objects = await osql.connect(sql);
         var len = objects.length;  
         var score = 0
