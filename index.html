@@ -1,0 +1,38 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="osql.js"></script>
+    <script type="text/javascript">
+    
+        function execButtonPressed() {
+            document.getElementById('result').innerHTML = '';
+            var userid = document.getElementById('id').value;
+            var password = document.getElementById('password').value;
+            osql.login(userid, password, function () {
+                document.getElementById('result').innerHTML = 'ログインに成功したぞ<br><a href="menu.html" class="btn btn-outline-success mt-3">メニューへ進む</a>';
+                //osql.back();
+            }, function () {
+                document.getElementById('result').innerHTML = 'ログインに失敗したぞ、もう一回人生やり直してこい';
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <title>Login</title>
+        <p>OurSQLのIDとパスワードを入力してください</p>
+        <br> ID:
+        <input id="id" type="text" size="20" value="">
+        <br> password:
+        <input id="password" type="password" size="20" value="">
+        <button onclick="execButtonPressed()" class="btn btn-outline-dark">実行</button>
+        <hr>
+        <div id="result"></div>
+    </div>
+</body>
+
+</html>

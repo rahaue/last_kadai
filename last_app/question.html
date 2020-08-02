@@ -1,0 +1,94 @@
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container alert alert-info">
+        <p>問題を作成します</p>
+        <div class="alert alert-warning">
+            
+            <ul>
+                <li>
+                    <label>科目を入力せよ：</label>
+                    <input id='subject' type="text" value="" class="form-control">
+                </li>
+                <li>
+                    <label>問題を入力せよ：</label>
+                    <textarea id='question' class="form-control" value=""></textarea>
+                </li>
+                <li>
+                    <label>答えを入力せよ：</label>
+                    <input id='answer' type="text" value="" class="form-control">
+                </li>
+                <li>
+                    <label>学籍番号は？：</label>
+                    <input id='student_id' type="text" value="" class="form-control">
+                </li>
+            </ul>
+            <input type="button" value="問題を作成する" onclick="buttonPressed()" class="btn btn-outline-secondary">
+        </div>
+        <p id="error"></p>
+
+        <div class="alert alert-light">
+            <a href="../menu.html" class="btn btn-outline-secondary">メニューに戻ります</a>
+        </div>
+        <hr>
+        <p>全ての問題を表示します</p>
+        <div id='result'></div>
+    </div>
+
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="../osql.js"></script>
+    <script type="text/javascript">
+
+        var timer;
+        $(document).ready(function () {
+            if (timer) { return; }//既に開始していたら，何もしない
+            //タイマーを開始する
+            timer = setInterval(update, 2000);
+        });
+
+        async function buttonPressed() {
+            var subject = document.getElementById('subject').value;
+            var question = document.getElementById('question').value;
+            var answer = document.getElementById('answer').value;
+            var student_id = document.getElementById('student_id').value;
+
+            if (student_id.length === 4)  {
+                var sql = 'insert into Question (subject, question, answer, student_id, time) values("' + subject + '","' + question + '","' + answer + '","' + student_id + '",now())';
+                await osql.connect(sql);
+                document.getElementById('error').innerHTML = "成功しました";
+            } else {
+                document.getElementById('error').innerHTML = "学生番号は4文字でお願いします";
+            }
+            
+        }
+
+        async function update() {
+        var sql = 'select * from Question';
+        var objects = await osql.connect(sql);
+        var str = '';
+        str += '<table border="1" class="table alert alert-light">'
+        var len = objects.length;
+        for (var i = 0; i < len; i++) {
+            var object = objects[i];
+
+            str += '<tr>';
+            for (key in object) {
+                var value = object[key];
+                str += '<td>';
+                str += value;
+                str += '</td>';
+            }
+                str += '</tr>';
+            }
+        str += '</table>'
+        document.getElementById('result').innerHTML = str;
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,64 @@
+<html>
+
+<head>
+    <title>スコア歴</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="../osql.js"></script>
+    <script type="text/javascript">
+
+    async function buttonPressed() {
+      
+      var student_id = document.getElementById('score').value;
+      var sql = `select * from Scores where '${student_id}' = Scores.student_id`;
+      var objects = await osql.connect(sql);
+      var str = '';
+      str += '<table border="2" class="alert alert-light table">'
+      str += '<tr>';
+      str += '<th>学生番号</th>';
+      str += '<th>スコア</th>';
+      str += '<th>時刻</th>';
+      str += '</tr>'
+      var len = objects.length;
+      for (var i = 0; i < len; i++) {
+        var object = objects[i];
+        str += '<tr>';
+        for (key in object) {
+          var value = object[key];
+          str += '<td>';
+          str += value;
+          str += '</td>';
+            }
+        str += '</tr>';
+      }
+        str += '</table>'
+
+        var you = "こちらがあなたのスコアになります"
+        document.getElementById('you').innerHTML = you
+        document.getElementById('result1').innerHTML = str;
+        }
+
+    
+</script>
+</head>
+
+<body>
+    <div class="container alert alert-info">
+
+        <div class="append alert alert-warning">
+            <label>スコアを表示します</label>
+            <p>学生番号を入力してください：</p>
+            <input type="text" id="score" value="">
+            <input type="button" value="あなたを探す" onclick="buttonPressed()" class="btn btn-outline-secondary">
+        </div>
+
+        <div class="back alert alert-light">
+          <a href="../menu.html" class="btn btn-outline-secondary">メニューに戻ります</a>
+        </div>
+    <hr>
+    <p id="you"></p>
+    <div id="result1"></div>
+    
+</body>
+
+</html>

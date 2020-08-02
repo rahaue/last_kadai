@@ -1,0 +1,101 @@
+<html>
+
+<head>
+    <title>学生登録</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="../osql.js"></script>
+    <script type="text/javascript">
+    var timer;
+        $(document).ready(function () {
+            if (timer) { return; }//既に開始していたら，何もしない
+            //タイマーを開始する
+            timer = setInterval(update, 2000);
+        });
+
+    async function update() {
+        var sql = 'select * from Student';
+        var objects = await osql.connect(sql);
+        var str = '';
+        str += '<table border="2" class="alert alert-light table">'
+        str += '<tr>';
+        str += '<th>学生番号</th>';
+        str += '<th>お名前</th>';
+        str += '</tr>'
+        var len = objects.length;
+        for (var i = 0; i < len; i++) {
+            var object = objects[i];
+            str += '<tr>';
+            for (key in object) {
+                var value = object[key];
+                str += '<td>';
+                str += value;
+                str += '</td>';
+            }
+                str += '</tr>';
+            }
+        str += '</table>'
+        document.getElementById('result').innerHTML = str;
+        }
+
+    async function buttonPressed2(){
+        var name = document.getElementById('d_name').value;
+        var sql = 'delete from Student where student_id = "' +  name + '"';
+        await osql.connect(sql);
+    }
+
+    async function buttonPressed3() {
+        var student_id = document.getElementById('student_id').value;
+        var name = document.getElementById('name').value;
+
+        if (student_id.length === 4) {
+            var sql = 'insert into Student(student_id, name) values("' + student_id + '","' + name + '")';
+            await osql.connect(sql);
+            document.getElementById('result1').innerHTML = "登録しました";
+        } else {
+            document.getElementById('result1').innerHTML = "学生番号は4文字でお願いします";
+        }
+    }
+</script>
+<style>
+
+
+
+    
+
+</style>
+</head>
+
+<body>
+    <div class="container alert alert-info">
+
+        <div class="append alert alert-warning">
+            <p>新規追加</p>
+            <p>学生番号は4文字のみになります</p>
+            <ul>
+                <li>
+                    <label>生徒番号：</label>
+                    <input id='student_id' type="text" value="">
+                </li>
+                <li>
+                    <label>名前：</label>
+                    <input id='name' value="">
+                </li>
+            </ul>
+            <input type="button" value="学生を登録します" onclick="buttonPressed3()" class="btn btn-outline-secondary">
+            <p id="result1"></p>
+        </div>
+        <div class="delete append alert alert-warning">
+            <p>ここで削除できます</p>
+            学生番号：<input type="text" id="d_name">
+            <button onclick="buttonPressed2()" class="btn btn-outline-secondary">削除します</button>
+        </div>
+        <div class="back append alert alert-light">
+            <a href="../menu.html" class="btn btn-outline-info">メニューに戻ります</a>
+        </div>
+        <hr>
+        <div id="result"></div>
+    </div>
+</body>
+
+</html>

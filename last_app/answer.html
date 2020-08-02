@@ -1,0 +1,161 @@
+<html lang="ja">
+
+<head>
+  <!-- CSS only -->
+<title>解答ページ</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+</head>
+<body>
+  <div class="container alert alert-info">
+    <div class="header alert alert-danger">
+      <h1>解答ページ</h1>
+    </div>
+    <div class="main">
+      <div class="index alert alert-warning">
+        <label>学生番号：</label>
+        <input id='student_id' type="text" value="">
+        <label>科目：</label>
+        <input id='subject' type="text" value="">
+        <input type="button" value="問題を表示" onclick="buttonPressed()" class="btn btn-outline-secondary">
+        <p id="error"></p>
+      </div>
+    <div class="back alert alert-light">
+      <a href="../menu.html" class="btn btn-outline-info">戻ります</a>
+    </div>
+      <div class="response">
+        <p><span id="your_name"></span></p>
+        <div id='result'></div>
+        <div id='result2'></div>
+    </div>
+    </div>
+  </div>
+</div>
+
+
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript" src="../osql.js"></script>
+    <script type="text/javascript">
+      async function buttonPressed() {
+        var student_id = document.getElementById('student_id').value;
+        var subject = document.getElementById('subject').value;
+        
+
+
+        if (student_id.length === 4)  {
+
+
+          // 名前を表示する
+          var sql = 'select Student.name from Student where Student.student_id ="' + student_id + '"';
+          var objects = await osql.connect(sql);
+          document.getElementById('error').innerHTML = "成功しました";
+          var str = '';
+          var len = objects.length;
+          for (var i = 0; i < len; i++) {
+            //一つのレコードを取得 
+            var object = objects[i];
+            str += '';
+            // objectの中にキーが入る
+            for (key in object) {
+                // 値を取得
+                var value = object[key];
+                str += "こちらが";
+                str += value;
+                str += "様の今日の問題です"
+            };
+          }
+          document.getElementById('your_name').innerHTML = str;
+
+          // 24時間以内に作ったもの
+          var now = new Date();
+          var yesterday = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate() - 1} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+
+          // 昨日の時間よりもtimeが早ければ表示する
+          var sql = 'select Question.question from Question where Question.student_id ="'+ student_id + '" and Question.subject = "'+ subject +'" and time >= "'+ yesterday +'"';
+
+          var objects = await osql.connect(sql);
+          document.getElementById('error').innerHTML = "成功しました";
+          var str = '';
+          str += '<table border="2" class="alert alert-light table">'
+          str += '<tr>';
+          str += '<th>問題</th>';
+          str += '<th>解答記入欄</th>';
+          str += '</tr>'
+          var len = objects.length;
+          
+          for (var i = 0; i < len; i++) {
+            //一つのレコードを取得 
+            var object = objects[i];
+            // objectの中にキーが入る
+            str += "<tr>"
+            for (key in object) {
+                // 値を取得
+                var value = object[key];
+                
+                str += "<td>"
+                str += "(" + (i + 1) + ") "
+                str += value;
+                // ここに解答記入欄を作成
+                str += "</td>"
+                str +=  "<td>"
+                str += '解答記入欄：'
+                str += '<input type="text" id="answer' + i + '">'
+                str += "</td>"
+            };
+            str += '</tr>'
+          }
+          str += '</table>';
+          str += '<div class="alert alert-light">'
+          str += "<input type=button value='解答を送信' onclick='buttonPressed2()' class='btn btn-outline-warning'>"
+          str += "</div>"
+          document.getElementById('result').innerHTML = str;
+          
+          } else {
+          document.getElementById('error').innerHTML = "学生番号は4文字でお願いします";
+          }
+      }
+
+
+      async function buttonPressed2() {
+
+        var student_id = document.getElementById('student_id').value;
+        var subject = document.getElementById('subject').value;
+        var sql = 'select Question.answer from Question where Question.student_id ="' + student_id + '" and Question.subject = "'+ subject + '"';
+        var objects = await osql.connect(sql);
+        var len = objects.length;  
+        var score = 0
+        for (var i = 0; i < len; i++) {
+            //一つのレコードを取得 
+            var object = objects[i];
+            // objectの中にキーが入る
+            for (key in object) {
+                // 値を取得
+                var value = object[key];
+                // ここから本領発揮
+                var id_answer = "answer" + i
+                var answer = document.getElementById(id_answer).value;
+                if(value === answer) {
+                  score += 10;
+                }
+            };
+          }
+
+        // スコアを保存します
+        var sql = 'insert into Scores(student_id, score, time) values("' + student_id + '","' + score + '",now())';
+        await osql.connect(sql);
+
+        var str = ''
+        str += "<div id='score'>"
+        str += score
+        str += "点です。おめでとうございます。<br>"
+        str += "スコアはデータベースに保存されました"
+        str += "</div>"
+        document.getElementById('result2').innerHTML = str;
+      }
+
+
+
+
+    </script>
+</body>
+
+</html>
